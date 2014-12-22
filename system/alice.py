@@ -158,6 +158,14 @@ class Alice:
 
 
 	#=======================================================================================#
+	# Gtors and Stors                                                                       #
+	#=======================================================================================#
+	
+	def get_plugin_manager(self):
+		return self._plugin_manager
+
+
+	#=======================================================================================#
 	# Void Function Calls                                                                   #
 	#=======================================================================================#
 
@@ -195,7 +203,14 @@ class Alice:
 		void_func = VoidFunction('BCASTCHAT', message)
 		self._rabbithole.send_void_func(void_func)
 
-	def tell(self, player, message):
+	##
+	# Sends a chat message to a secific player.
+	# 
+	# tell:
+	# 	@param player_id [int] - The player ID that is to recieve the message
+	# 	@param message   [str] - The message to send to the player
+	##
+	def tell(self, player_id, message):
 		void_func = VoidFunction('TELL', player_id, message)
 		self._rabbithole.send_void_func(void_func)
 

@@ -6,5 +6,5 @@ class Command(BaseCommand):
 		self.description = "Invokes a response from Alice"
 		self.args        = 0
 
-	def execute(self):
+	def execute(self, executor, args, argc):
 		pass

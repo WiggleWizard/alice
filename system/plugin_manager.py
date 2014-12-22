@@ -16,7 +16,11 @@ class PluginManager:
 		self._plugin_priority = json.load(json_data)
 		json_data.close()
 
-	# Loads plugins from the Plugin folder
+	##
+	# Loads plugins from the Plugin folder.
+	# 
+	# load_plugins:
+	##
 	def load_plugins(self):
 		for fn in os.listdir(self._plugin_dir):
 			file_path = self._plugin_dir + fn
@@ -28,6 +32,7 @@ class PluginManager:
 					f, filename, desc = imp.find_module(file_base_name, [self._plugin_dir])
 					plugin = imp.load_module(file_base_name, f, filename, desc).Plugin()
 					plugin._alice = self._alice
+					plugin.machine_name = file_base_name
 
 					# Do not continue to load the plugin if it has no name
 					if not hasattr(plugin, 'name'):
@@ -48,7 +53,11 @@ class PluginManager:
 					else:
 						print('[PluginManager] Loaded plugin ' + plugin.name)
 
-	# Sorts the loaded plugins based on their priority number
+	##
+	# Sorts the loaded plugins based on their priority number.
+	# 
+	# prioritize_plugins:
+	##
 	def prioritize_plugins(self):
 		self._plugins.sort(key=lambda x: x._priority)
 
@@ -65,11 +74,27 @@ class PluginManager:
 				pass
 
 
-
-	#============================================================================
-	# Plugin Propagation Calls
-	#============================================================================
+	#=======================================================================================#
+	# Gtors and Stors                                                                       #
+	#=======================================================================================#
 	
+	##
+	# Gets a plugin instance, mostly used to interact with a plugin or set variables.
+	# 
+	# get_plugin_instance:
+	# 	@param  plugin_name [str]    - Plugin's machine name (Base file name)
+	# 	@return             [Plugin] - Plugin instance
+	##
+	def get_plugin_instance(self, plugin_machine_name):
+		for plugin in self._plugins:
+			if plugin.machine_name == plugin_machine_name:
+				return plugin
+
+
+	#=======================================================================================#
+	# Plugin Propagation Calls                                                              #
+	#=======================================================================================#
+		
 	def propagate_on_server_init(self):
 		for plugin in self._plugins:
 			try:
