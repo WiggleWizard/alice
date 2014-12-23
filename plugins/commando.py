@@ -19,45 +19,6 @@ class Plugin(BasePlugin):
 	def on_plugin_init(self):
 		self._load_commands()
 
-	def on_player_chat(self, player, message):
-		if message[0] == self._director:
-			print("Command")
-			message_split = message[1:].split(" ", 1)
-
-			# If the command looks like "!" or "! command" this if statement
-			# will catch this type of input.
-			if message_split[0] == "":
-				player.tell("^1No such command")
-				return None
-
-			cmd_issued = message_split[0]
-
-			arg_string = None
-			try:
-				arg_string = message_split[1]
-			except IndexError:
-				pass
-
-			found_cmd = False
-
-			for command in self._commands:
-				if command.alias == cmd_issued:
-					# We attempt to execute the custom executor which
-					# we assume will deal with the argument string itself
-					# in its own way.
-					try:
-						command.execute_custom(player, arg_string)
-					except AttributeError:
-						# Now we split the input argument according to the command's
-						# spec.
-						try:
-
-							command.execute(player)
-						except AttributeError:
-							self.log_info(command.alias + " does not have an execution function")
-		else:
-			return message
-
 	##
 	# Loads commands in commando_data into memory.
 	# 
@@ -86,3 +47,64 @@ class Plugin(BasePlugin):
 				self._commands.append(command)
 
 				self.log_info("Loaded command " + command.alias)
+
+	def on_player_chat(self, player, message):
+		if message[0] == self._director:
+			cmd_issued, arg_string = self._parse_message(message[1:])
+
+			# If the command given was in the correct semantical structure
+			if cmd_issued:
+				cmd_result = self._attempt_exec(cmd_issued, arg_string)
+			else:
+				player.tell("^1Invalid command semantics")
+		else:
+			return message
+
+	##
+	# Parses the message into command and arg string.
+	# 
+	# _parse_message:
+	# 	@param  message [str] - Input string, without director
+	# 	@return         [str] - Command without director. Will return None if
+	# 							the command semantics are incorrect.
+	# 	@return         [str] - Entire string after command. Will return None
+	# 							if no args are given.
+	##
+	def _parse_message(self, message):
+		message_split = message.split(" ", 1)
+
+		# If the command looks like "!" or "! command" this if statement
+		# will catch this type of input.
+		cmd_issued = None
+		if message_split[0] != "":
+			cmd_issued = message_split[0]
+
+		arg_string = None
+		if len(message_split) > 1:
+			arg_string = message_split[1]
+
+		return cmd_issued, arg_string
+
+	##
+	# Attemps to execute the input command and if there's a command to execute
+	# the args are passed to the command.
+	# 
+	# _attempt_exec:
+	# 	$param command    [str] - Command
+	# 	$param arg_string [str] - Full argument string
+	##
+	def _attempt_exec(self, cmd_issued, arg_string):
+		for command in self._commands:
+			if command.alias == cmd_issued:
+				if hasattr(command, 'execute'):
+					# Attempt to split the args according to how the command
+					# specified, if it's not specified then we just pass
+					# the entire arg string to the execute function and assume
+					# that the command will deal with it there.
+					split_max = 0
+					if hasattr(command, 'argc'):
+						split_max = command.argc
+
+					command.execute(player, args.split(" ", split_max))
+				else:
+					self.log_info(command.alias + " does not have an execution function")
