@@ -7,11 +7,11 @@ class ReturnFunction:
 		self._return = None
 		self._args = []
 
-		if a1:
+		if a1 != None:
 			self._args.append(a1)
-		if a2:
+		if a2 != None:
 			self._args.append(a2)
-		if a3:
+		if a3 != None:
 			self._args.append(a3)
 
 		self._func_name = function_name

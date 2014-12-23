@@ -21,6 +21,7 @@ class Plugin(BasePlugin):
 
 	def on_player_chat(self, player, message):
 		if message[0] == self._director:
+			print("Command")
 			message_split = message[1:].split(" ", 1)
 
 			# If the command looks like "!" or "! command" this if statement
@@ -30,12 +31,30 @@ class Plugin(BasePlugin):
 				return None
 
 			cmd_issued = message_split[0]
-			args       = message_split[1]
+
+			arg_string = None
+			try:
+				arg_string = message_split[1]
+			except IndexError:
+				pass
 
 			found_cmd = False
 
 			for command in self._commands:
-				if command.alias 
+				if command.alias == cmd_issued:
+					# We attempt to execute the custom executor which
+					# we assume will deal with the argument string itself
+					# in its own way.
+					try:
+						command.execute_custom(player, arg_string)
+					except AttributeError:
+						# Now we split the input argument according to the command's
+						# spec.
+						try:
+
+							command.execute(player)
+						except AttributeError:
+							self.log_info(command.alias + " does not have an execution function")
 		else:
 			return message
 

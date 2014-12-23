@@ -211,6 +211,7 @@ class Alice:
 	# 	@param message   [str] - The message to send to the player
 	##
 	def tell(self, player_id, message):
+		print("Tell: " + str(player_id) + " " + message)
 		void_func = VoidFunction('TELL', player_id, message)
 		self._rabbithole.send_void_func(void_func)
 

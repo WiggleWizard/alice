@@ -1,4 +1,5 @@
 {
 	"filter_ip": 1,
-	"defaults": 2
+	"commando": 2,
+	"defaults": 3
 }
