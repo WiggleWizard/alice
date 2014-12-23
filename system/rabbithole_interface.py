@@ -37,6 +37,12 @@ class RabbitholeInterface:
 	def close(self):
 		self._sock.close()
 
+	##
+	# Requests a return from Wonderland when calling a function.
+	# 
+	# send_return_func:
+	# 	@param return_func [ReturnFunction] - Return function instance
+	##
 	def send_return_func(self, return_func):
 		compiled = return_func.compile()
 

@@ -8,6 +8,3 @@ class Command(BaseCommand):
 
 	def execute(self, executor, args, argc):
 		pass
-
-	def execute_custom(self, executor, arg_string):
-		pass
