@@ -12,7 +12,7 @@ class PluginManager:
 		self._plugins = []
 
 		# Load the plugin priority
-		json_data = open(globals.BASE_PATH + '/plugin_priority.json')
+		json_data = open(globals.BASE_PATH + '/plugin_priority.cfg')
 		self._plugin_priority = json.load(json_data)
 		json_data.close()
 
@@ -48,10 +48,6 @@ class PluginManager:
 					# Add the plugin object in to the list
 					self._plugins.append(plugin)
 
-					if hasattr(plugin, 'version'):
-						print('[PluginManager] Loaded plugin ' + plugin.name + ' v' + plugin.version)
-					else:
-						print('[PluginManager] Loaded plugin ' + plugin.name)
 
 	##
 	# Sorts the loaded plugins based on their priority number.
@@ -63,7 +59,7 @@ class PluginManager:
 
 	def initialize_plugins(self):
 		for plugin in self._plugins:
-			if hasattr(plugin, '_version'):
+			if hasattr(plugin, 'version'):
 				print('[PluginManager] Initializing plugin ' + plugin.name + ' v' + plugin.version)
 			else:
 				print('[PluginManager] Initializing ' + plugin.name)
@@ -97,31 +93,23 @@ class PluginManager:
 		
 	def propagate_on_server_init(self):
 		for plugin in self._plugins:
-			try:
+			if hasattr(plugin, "on_server_init"):
 				plugin.on_server_init()
-			except AttributeError:
-				pass
 
 	def propagate_on_join_req(self, ip, qport):
 		for plugin in self._plugins:
-			try:
+			if hasattr(plugin, "on_join_req"):
 				plugin.on_join_req(ip, qport)
-			except AttributeError:
-				pass
 
 	def propagate_on_player_chat(self, player, message):
 		for plugin in self._plugins:
-			try:
+			if hasattr(plugin, "on_player_chat"):
 				if message != None and message != "":
 					message = plugin.on_player_chat(player, message)
 				else:
 					break
-			except AttributeError:
-				pass
 
-	def propagate_on_join(self, player):
+	def propagate_on_player_join(self, player):
 		for plugin in self._plugins:
-			try:
-				plugin.on_join(player)
-			except AttributeError:
-				pass
+			if hasattr(plugin, "on_player_join"):
+				plugin.on_player_join(player)

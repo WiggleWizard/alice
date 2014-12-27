@@ -16,3 +16,7 @@ class BasePlugin(object):
 
 	def broadcast_chat(self, message):
 		self._alice.broadcast_chat(message)
+
+	def get_plugin(self, plugin_name):
+		plugin_manager = self._alice.get_plugin_manager()
+		return plugin_manager.get_plugin_instance(plugin_name)

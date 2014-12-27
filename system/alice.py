@@ -117,7 +117,7 @@ class Alice:
 
 			self._players[slot_id].init(slot_id, player_ip, player_guid, player_name)
 
-			plugin_man.propagate_on_join(self._players[slot_id])
+			plugin_man.propagate_on_player_join(self._players[slot_id])
 		elif event_name == 'JOINREQ':
 			ip    = event.get_arg(0)
 			qport = event.get_arg(1)
@@ -244,4 +244,29 @@ class Alice:
 		return_func = ReturnFunction('PLAYERDATA', 1)
 		rtn = self._rabbithole.send_return_func(return_func)
 		
+		return rtn
+
+
+	#=======================================================================================#
+	# Player Search Functions                                                               #
+	#=======================================================================================#
+
+	##
+	# Finds player(s) based on a partial input search. Search is not
+	# case sensitive.
+	# 
+	# find_players_by_partial:
+	# 	@param  partial_name [str]  - Partial name.
+	# 	@return              [list] - A list of Player instance objects.
+	##
+	def find_players_by_partial(self, partial_name):
+		rtn = []
+		l_partial_name = partial_name.lower()
+
+		for player in self._players:
+			if player != None:
+				l_player_name = player.get_clean_name().lower()
+				if l_player_name.find(l_partial_name) > -1:
+					rtn.append(player)
+
 		return rtn

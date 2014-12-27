@@ -4,6 +4,7 @@ import system.globals
 
 from system.base_plugin import BasePlugin
 
+# Internal
 CMD_STATUS_NO_CMD      = 0
 CMD_STATUS_SUCCESS     = 1
 CMD_STATUS_MISSING_ARG = 2
@@ -13,11 +14,11 @@ class Plugin(BasePlugin):
 	def __init__(self):
 		super(BasePlugin, self).__init__()
 		
-		self.name     = 'Commando'
+		self.name     = 'Advanced Commands'
 		self.version  = '0.1a'
 
 		self._director = "!"
-		self._commands_dir = system.globals.PLUGINS_PATH + '/commando_data/'
+		self._commands_dir = system.globals.PLUGINS_PATH + '/adv_commands_data/'
 
 		self._commands = []
 
@@ -67,6 +68,11 @@ class Plugin(BasePlugin):
 			# If the command given was in the correct semantical structure
 			if cmd_issued:
 				cmd_result = self._attempt_exec(player, cmd_issued, arg_string)
+
+				if cmd_result == CMD_STATUS_NO_CMD:
+					player.tell("^1No such command")
+				elif cmd_result == CMD_STATUS_NO_PERMS:
+					player.tell("^1You do not have permission to execute this command")
 			else:
 				player.tell("^1Invalid command semantics")
 		else:
@@ -91,7 +97,7 @@ class Plugin(BasePlugin):
 		if message_split[0] != "":
 			cmd_issued = message_split[0]
 
-		arg_string = None
+		arg_string = ""
 		if len(message_split) > 1:
 			arg_string = message_split[1]
 
@@ -109,7 +115,11 @@ class Plugin(BasePlugin):
 	def _attempt_exec(self, player, cmd_issued, arg_string):
 		for command in self._commands:
 			if command.alias == cmd_issued:
-				if hasattr(command, 'execute'):
+				if hasattr(command, "execute"):
+					if hasattr(command, "required_perm"):
+						if not player.has_perm(command.required_perm):
+							return CMD_STATUS_NO_PERMS
+
 					# Attempt to split the args according to how the command
 					# specified, if it's not specified then we just pass
 					# the entire arg string to the execute function and assume
@@ -120,13 +130,19 @@ class Plugin(BasePlugin):
 
 					args = arg_string.split(" ", split_max)
 
+					if args[0] == "":
+						args = []
+
 					# If the amount of args that came from the arg splitting
 					# code doesn't match the number of expected args from
 					# the command then just return a status.
 					if hasattr(command, 'argc') and len(args) != command.argc:
 						return CMD_STATUS_MISSING_ARG
 
-					command.execute(player, args)
+					cmd_result = command.execute(player, args)
+
+					if cmd_result == None:
+						cmd_result = CMD_STATUS_SUCCESS
 
 					return CMD_STATUS_SUCCESS
 				else:
