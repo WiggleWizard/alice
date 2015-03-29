@@ -11,9 +11,6 @@ class EventParser:
 			# Cursor position
 			cursor = 1
 
-			packetSize = struct.unpack('>I', packet[cursor:cursor+4])
-			cursor += 4
-
 			event_name_size = struct.unpack('>I', packet[cursor:cursor+4])
 			cursor += 4
 			e.set_name(packet[cursor:cursor + event_name_size[0]])

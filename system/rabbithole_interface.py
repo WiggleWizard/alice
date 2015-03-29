@@ -1,41 +1,28 @@
-import socket
+import zmq
 import struct
 import globals
 
 class RabbitholeInterface:
 	def __init__(self):
-		self._sock = None
-		self._packet_buffer = []
+		self._zmq_context = zmq.Context(1)
+		self._zmq_client  = None
 
 	# Connects to the rabbit hole and stores the connection
 	# locally
 	def connect(self, path):
-		self._sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
-
-		try:
-			self._sock.connect(path)
-		except:
-			print >> sys.stderr, msg
-			sys.exit(1)
+		self._zmq_client = self._zmq_context.socket(zmq.DEALER)
+		self._zmq_client.connect("ipc://%s" % path)
 
 		print('[RabbitholeInterface] Connection to rabbit hole "' + path + '" successful')
 
+	##
+	# Blocks until there is data
+	##
 	def recv(self):
-		# At the beginning of each packet there's 5 bytes that describes
-		# the packet type and the payload length
-		rx = self._sock.recv(5)
-
-		if len(rx) >= 5:
-			# Once we recieve the payload length we then attempt to recieve the rest of the packet
-			payload_len = struct.unpack('>I', rx[1:])[0]
-			rx += self._sock.recv(payload_len)
-
-			return rx
-		else:
-			return None
+		return self._zmq_client.recv()
 
 	def close(self):
-		self._sock.close()
+		self._zmq_client.close()
 
 	##
 	# Requests a return from Wonderland when calling a function.
@@ -55,7 +42,7 @@ class RabbitholeInterface:
 			print(out + ")")
 			print("\t[" + ":".join("{:02x}".format(ord(c)) for c in compiled) + "]")
 
-		self._sock.send(compiled)
+		self._zmq_client.send(compiled)
 
 		# Now we wait for a return, anything that's NOT the returning function
 		# should be put into the buffer which will be dealt with after dealing

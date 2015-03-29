@@ -18,10 +18,7 @@ class Alice:
 		self._server_initialized = False
 		self._max_players = 0
 
-		# Since we only need once off information from a wonderland connection
-		# we have no need to keep the object around.
-		wland_interface = WonderlandInterface()
-		rabbit_hole_path = wland_interface.request_rabbithole('alicetest')
+		rabbit_hole_path = "/tmp/rabbithole.ipc.28960"
 
 		# Create the connection to the rabbit hole
 		self._rabbithole = RabbitholeInterface()
@@ -100,7 +97,7 @@ class Alice:
 				self._initialize()
 		elif event_name == 'CHAT':
 			slot_id = event.get_arg(0)
-			message = event.get_arg(2)
+			message = event.get_arg(1)
 			player  = self._players[slot_id]
 			
 			plugin_man.propagate_on_player_chat(player, message)
@@ -228,7 +225,7 @@ class Alice:
 	##
 	def get_max_players(self):
 		if self._max_players == 0:
-			return_func = ReturnFunction('GETMAXCLIENTS', 1)
+			return_func = ReturnFunction('GETSLOTCOUNT', 1)
 			self._max_players = self._rabbithole.send_return_func(return_func)
 
 		return self._max_players

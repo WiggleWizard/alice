@@ -15,6 +15,7 @@ class ReturnFunction:
 			self._args.append(a3)
 
 		self._func_name = function_name
+		self._client_id = 0
 		self._packet_id = packet_id
 
 	def compile(self):
@@ -23,6 +24,9 @@ class ReturnFunction:
 		sz = 0
 		payload = ''
 
+		# - Client ID
+		sz += 4
+		payload += struct.pack('>I', self._client_id)
 		# - Packet ID
 		sz += 4
 		payload += struct.pack('>I', self._packet_id)
@@ -53,16 +57,16 @@ class ReturnFunction:
 				sz += length
 				payload += arg
 
-		packet = 'R' + struct.pack('>I', len(payload)) + payload
+		packet = 'R' + payload
 
 		return packet
 
 	def parse(self, packet):
 		if packet[0] == 'R':
 			# Cursor position
-			cursor = 1
-			cursor += 4
-			cursor += 4
+			cursor = 1  # Packet type
+			cursor += 4 # Client ID
+			cursor += 4 # Packet ID
 
 			return_type = struct.unpack('>b', packet[cursor:cursor + 1])[0]
 			cursor += 1
