@@ -2,7 +2,7 @@ import struct
 
 import globals
 
-class ReturnFunction:
+class Function:
 	def __init__(self, function_name, packet_id, a1=None, a2=None, a3=None):
 		self._return = None
 		self._args = []
@@ -57,14 +57,14 @@ class ReturnFunction:
 				sz += length
 				payload += arg
 
-		packet = 'R' + payload
+		packet = 'F' + payload
 
 		return packet
 
 	def parse(self, packet):
 		if packet[0] == 'R':
 			# Cursor position
-			cursor = 1  # Packet type
+			cursor  = 1 # Packet type
 			cursor += 4 # Client ID
 			cursor += 4 # Packet ID
 

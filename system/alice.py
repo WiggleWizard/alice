@@ -4,9 +4,8 @@ from system.plugin_manager       import PluginManager
 from system.wonderland_interface import WonderlandInterface
 from system.rabbithole_interface import RabbitholeInterface
 
-from system.event           import EventParser
-from system.void_function   import VoidFunction
-from system.return_function import ReturnFunction
+from system.event    import EventParser
+from system.function import Function
 
 from system.player import Player
 
@@ -225,7 +224,7 @@ class Alice:
 	##
 	def get_max_players(self):
 		if self._max_players == 0:
-			return_func = ReturnFunction('GETSLOTCOUNT', 1)
+			return_func = Function('GETSLOTCOUNT', 1)
 			self._max_players = self._rabbithole.send_return_func(return_func)
 
 		return self._max_players
@@ -238,7 +237,7 @@ class Alice:
 	# 	@return [str] - Formatted player data
 	##
 	def get_player_data(self):
-		return_func = ReturnFunction('PLAYERDATA', 1)
+		return_func = Function('PLAYERDATA', 1)
 		rtn = self._rabbithole.send_return_func(return_func)
 		
 		return rtn
