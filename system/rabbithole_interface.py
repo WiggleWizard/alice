@@ -28,14 +28,14 @@ class RabbitholeInterface:
 	# Requests a return from Wonderland when calling a function.
 	# 
 	# send_return_func:
-	# 	@param return_func [ReturnFunction] - Return function instance
+	# 	@param func [ReturnFunction] - Return function instance
 	##
-	def send_return_func(self, return_func):
-		compiled = return_func.compile()
+	def send_return_func(self, func):
+		compiled = func.compile()
 
 		if globals.DEBUG:
-			function_name = return_func.get_function_name()
-			args          = return_func.get_args()
+			function_name = func.get_function_name()
+			args          = func.get_args()
 
 			out = 'Sending return function: ' + function_name + '('
 			out += ', '.join(map(str, args))
@@ -55,23 +55,28 @@ class RabbitholeInterface:
 					print("Recieved return function: ")
 					print("\t[" + ":".join("{:02x}".format(ord(c)) for c in packet) + "]")
 
-				return_func.parse(packet)
-				return return_func.get_return()
+				func.parse(packet)
+				return func.get_return()
 
 			self._packet_buffer.append(packet)
 
-	def send_void_func(self, void_func):
-		compiled = void_func.compile()
+	##
+	# Pretty much the same as above except it doesn't wait for a returning packet.
+	# 
+	# send_void_func:
+	def send_void_func(self, func):
+		compiled = func.compile()
 
 		if globals.DEBUG:
-			function_name = void_func.get_function_name()
-			args          = void_func.get_args()
+			function_name = func.get_function_name()
+			args          = func.get_args()
 
 			out = "Sending void function: " + function_name + "("
 			out += ', '.join(map(str, args))
 			print(out + ")")
 			print("\t[" + ":".join("{:02x}".format(ord(c)) for c in compiled) + "]")
 		
-		self._sock.send(compiled)
+		self._zmq_client.send(compiled)
+
 
 	

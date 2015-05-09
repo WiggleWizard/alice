@@ -173,7 +173,7 @@ class Alice:
 	# 	@param qport [int] - Quake port
 	##
 	def accept_ip(self, ip, qport):
-		void_func = VoidFunction('LIMBOACCEPT', ip, qport)
+		void_func = Function('LIMBOACCEPT', ip, qport)
 		self._rabbithole.send_void_func(void_func)
 
 	##
@@ -186,7 +186,7 @@ class Alice:
 	# 						   user.
 	##
 	def deny_ip(self, ip, qport, message):
-		void_func = VoidFunction('LIMBODENY', ip, qport, message)
+		void_func = Function('LIMBODENY', ip, qport, message)
 		self._rabbithole.send_void_func(void_func)
 
 	##
@@ -196,7 +196,7 @@ class Alice:
 	# 	@param message [str] - Chat message to broadcast
 	##
 	def broadcast_chat(self, message):
-		void_func = VoidFunction('BCASTCHAT', message)
+		void_func = Function('BCASTCHAT', message)
 		self._rabbithole.send_void_func(void_func)
 
 	##
@@ -208,7 +208,7 @@ class Alice:
 	##
 	def tell(self, player_id, message):
 		print("Tell: " + str(player_id) + " " + message)
-		void_func = VoidFunction('TELL', player_id, message)
+		void_func = Function('TELL', player_id, message)
 		self._rabbithole.send_void_func(void_func)
 
 
