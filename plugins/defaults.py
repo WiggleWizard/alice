@@ -18,4 +18,4 @@ class Plugin(BasePlugin):
 		pass
 
 	def command_pizza(self, executor, args):
-		print("WOT")
+		pass

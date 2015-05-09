@@ -111,7 +111,7 @@ class Plugin(BasePlugin):
 				# If the amount of args that came from the arg splitting
 				# code doesn't match the number of expected args from
 				# the command then just return a status.
-				if len(args) != command['argc']:
+				if command['argc'] != 0 and len(args) != command['argc']:
 					return CMD_STATUS_MISSING_ARG
 
 				# When executing the function attached to the command, we
