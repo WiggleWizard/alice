@@ -32,7 +32,7 @@ class Plugin(BasePlugin):
 		Player._sigil_group_rank = 0
 
 		# Player function extensions
-		Player.has_perm               = None
+		Player.has_perm               = player_has_perm
 		Player.set_perms              = None
 		Player.retrieve_sigil_id      = player_retrieve_sigil_id
 		Player.retrieve_sigil_details = player_retrieve_sigil_details

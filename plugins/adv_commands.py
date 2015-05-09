@@ -23,36 +23,15 @@ class Plugin(BasePlugin):
 		self._commands = []
 
 	def on_plugin_init(self):
-		self._load_commands()
+		pass
 
-	##
-	# Loads commands in commando_data into memory.
-	# 
-	# _load_commands:
-	##
-	def _load_commands(self):
-		for fn in os.listdir(self._commands_dir):
-			file_path = self._commands_dir + fn
-			file_base_name, ext = os.path.splitext(fn)
-
-			if os.path.isfile(self._commands_dir + fn):
-				# Ensure we do not hit the base command module
-				if file_base_name == "base_command" or file_base_name == "__init__":
-					continue
-
-				if ext != ".py":
-					continue
-
-				# Initialize the command and push it into the stack
-				f, filename, desc = imp.find_module(file_base_name, [self._commands_dir])
-				command = imp.load_module(file_base_name, f, filename, desc).Command()
-
-				# Place the alice instance into the command
-				command._alice = self._alice
-
-				self._commands.append(command)
-
-				self.log_info("Loaded command " + command.alias)
+	def register_command(self, function, alias, argc, required_perm=None):
+		self._commands.append({
+			'function':      function,
+			'alias':         alias,
+			'argc':          argc,
+			'required_perm': required_perm
+		})
 
 	##
 	# Triggered when a player chats.
@@ -108,44 +87,43 @@ class Plugin(BasePlugin):
 	# the args are passed to the command.
 	# 
 	# _attempt_exec:
-	# 	$param  command    [str] - Command
-	# 	$param  arg_string [str] - Full argument string
-	# 	$return            [int] - See CMD_STATUS_... for returns
+	# 	$param  player     [Player] - Executor
+	# 	$param  cmd_issued [str]    - Command
+	# 	$param  arg_string [str]    - Full argument string
+	# 	$return            [int]    - See CMD_STATUS_... for returns
 	##
 	def _attempt_exec(self, player, cmd_issued, arg_string):
 		for command in self._commands:
-			if command.alias == cmd_issued:
-				if hasattr(command, "execute"):
-					if hasattr(command, "required_perm"):
-						if not player.has_perm(command.required_perm):
-							return CMD_STATUS_NO_PERMS
+			if command['alias'] == cmd_issued:
+				if command['required_perm'] != None:
+					if not player.has_perm(command['required_perm']):
+						return CMD_STATUS_NO_PERMS
 
-					# Attempt to split the args according to how the command
-					# specified, if it's not specified then we just pass
-					# the entire arg string to the execute function and assume
-					# that the command will deal with it there.
-					split_max = 0
-					if hasattr(command, 'argc'):
-						split_max = command.argc
+				# Attempt to split the args according to how the command
+				# specified.
+				split_max = command['argc']
 
-					args = arg_string.split(" ", split_max)
+				args = arg_string.split(" ", split_max)
 
-					if args[0] == "":
-						args = []
+				if args[0] == "":
+					args = []
 
-					# If the amount of args that came from the arg splitting
-					# code doesn't match the number of expected args from
-					# the command then just return a status.
-					if hasattr(command, 'argc') and len(args) != command.argc:
-						return CMD_STATUS_MISSING_ARG
+				# If the amount of args that came from the arg splitting
+				# code doesn't match the number of expected args from
+				# the command then just return a status.
+				if len(args) != command['argc']:
+					return CMD_STATUS_MISSING_ARG
 
-					cmd_result = command.execute(player, args)
+				# When executing the function attached to the command, we
+				# give the function chance to return a status that will
+				# then result in a generic response from this plugin.
+				cmd_result = command['function'](player, args)
 
-					if cmd_result == None:
-						cmd_result = CMD_STATUS_SUCCESS
+				# If the command returns no status then we automatically
+				# assume it handled its own output.
+				if cmd_result == None:
+					cmd_result = CMD_STATUS_SUCCESS
 
-					return CMD_STATUS_SUCCESS
-				else:
-					self.log_info(command.alias + " does not have an execution function")
+				return cmd_result
 
 		return CMD_STATUS_NO_CMD

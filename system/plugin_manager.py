@@ -3,6 +3,7 @@ import os
 import imp
 
 import globals
+from base_plugin import BasePlugin
 
 class PluginManager:
 	def __init__(self, alice):
@@ -31,6 +32,7 @@ class PluginManager:
 					# Load up the module
 					f, filename, desc = imp.find_module(file_base_name, [self._plugin_dir])
 					plugin = imp.load_module(file_base_name, f, filename, desc).Plugin()
+
 					plugin._alice = self._alice
 					plugin.machine_name = file_base_name
 
@@ -64,10 +66,8 @@ class PluginManager:
 			else:
 				print('[PluginManager] Initializing ' + plugin.name)
 
-			try:
+			if hasattr(plugin, 'on_plugin_init'):
 				plugin.on_plugin_init()
-			except AttributeError:
-				pass
 
 
 	#=======================================================================================#
@@ -102,6 +102,10 @@ class PluginManager:
 				plugin.on_join_req(ip, qport)
 
 	def propagate_on_player_chat(self, player, message):
+		# Filter the stupid NAK character
+		if message[0] == chr(0x15):
+			message = message.lstrip(chr(0x15))
+				
 		for plugin in self._plugins:
 			if hasattr(plugin, "on_player_chat"):
 				if message != None and message != "":
