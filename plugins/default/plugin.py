@@ -2,8 +2,9 @@ from system.base_plugin import BasePlugin
 
 class Plugin(BasePlugin):
 	
-	name    = 'Defaults Plugin'
-	version = '1.0'
+	name         = 'default'
+	display_name = 'Default Plugin'
+	version      = '1.0'
 
 	def on_plugin_init(self):
 		pass

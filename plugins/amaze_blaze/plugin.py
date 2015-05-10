@@ -4,15 +4,17 @@ from system.player import Player
 
 class Plugin(BasePlugin):
 	
-	name    = 'Amaze Blaze'
-	version = '420.0'
+	name         = 'amaze_blaze'
+	display_name = 'Amaze Blaze'
+	version      = '420.0'
+	requires     = ['advanced_commands']
 
 	def on_plugin_init(self):
 		# Extend player
 		Player.is_blazing = False
 
 		# Register command
-		command_plugin = self.get_plugin("adv_commands")
+		command_plugin = self.get_plugin("advanced_commands")
 		command_plugin.register_command(self.command_420, "420", 0)
 
 	def on_player_dc(self, player):

@@ -11,12 +11,12 @@ CMD_STATUS_MISSING_ARG = 2
 CMD_STATUS_NO_PERMS    = 3
 
 class Plugin(BasePlugin):
-	def __init__(self):
-		super(BasePlugin, self).__init__()
-		
-		self.name     = 'Advanced Commands'
-		self.version  = '0.1a'
 
+	name         = 'advanced_commands'
+	display_name = 'Advanced Commands'
+	version      = '0.1a'
+
+	def __init__(self):
 		self._director = "!"
 		self._commands_dir = system.globals.PLUGINS_PATH + '/adv_commands_data/'
 
