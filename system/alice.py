@@ -196,7 +196,7 @@ class Alice:
 	# 	@param message [str] - Chat message to broadcast
 	##
 	def broadcast_chat(self, message):
-		void_func = Function('BCASTCHAT', message)
+		void_func = Function('BCASTPRINTF', 0, message)
 		self._rabbithole.send_void_func(void_func)
 
 	##
@@ -208,7 +208,7 @@ class Alice:
 	##
 	def tell(self, player_id, message):
 		print("Tell: " + str(player_id) + " " + message)
-		void_func = Function('TELL', player_id, message)
+		void_func = Function('CHATPRINTF', 0, player_id, message)
 		self._rabbithole.send_void_func(void_func)
 
 

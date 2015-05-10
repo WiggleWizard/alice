@@ -18,4 +18,4 @@ class Plugin(BasePlugin):
 		pass
 
 	def command_pizza(self, executor, args):
-		pass
+		self.broadcast_chat(executor.get_clean_name() + " has started eating a pizza")
