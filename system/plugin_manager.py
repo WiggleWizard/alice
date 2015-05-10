@@ -117,3 +117,8 @@ class PluginManager:
 		for plugin in self._plugins:
 			if hasattr(plugin, "on_player_join"):
 				plugin.on_player_join(player)
+
+	def propagate_on_player_dc(self, player):
+		for plugin in self._plugins:
+			if hasattr(plugin, "on_player_dc"):
+				plugin.on_player_dc(player)

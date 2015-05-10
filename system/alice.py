@@ -123,8 +123,10 @@ class Alice:
 			qport = event.get_arg(1)
 
 			plugin_man.propagate_on_join_req(ip, qport)
-		elif event_name == 'DISCONNECT':
+		elif event_name == 'DC':
 			slot_id = event.get_arg(0)
+
+			plugin_man.propagate_on_dc(slot_id)
 
 			self._players[slot_id] = None
 

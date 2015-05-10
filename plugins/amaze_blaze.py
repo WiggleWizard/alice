@@ -15,6 +15,9 @@ class Plugin(BasePlugin):
 		command_plugin = self.get_plugin("adv_commands")
 		command_plugin.register_command(self.command_420, "420", 0)
 
+	def on_player_dc(self, player):
+		player.is_blazing = False
+
 	def command_420(self, executor, args):
 		# Wants to pass his blaze on to another player
 		if len(args) > 0:
