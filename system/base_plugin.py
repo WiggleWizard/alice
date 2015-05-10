@@ -20,3 +20,6 @@ class BasePlugin(object):
 	def get_plugin(self, plugin_name):
 		plugin_manager = self._alice.get_plugin_manager()
 		return plugin_manager.get_plugin_instance(plugin_name)
+
+	def find_players_by_partial(self, partial_name):
+		return self._alice.find_players_by_partial(partial_name)

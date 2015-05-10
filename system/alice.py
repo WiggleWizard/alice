@@ -117,8 +117,6 @@ class Alice:
 			self._players[slot_id] = Player(self)
 			self._players[slot_id].init(slot_id, player_ip, player_guid, player_name)
 
-			print(self._players[slot_id])
-
 			plugin_man.propagate_on_player_join(self._players[slot_id])
 		elif event_name == 'JOINREQ':
 			ip    = event.get_arg(0)
