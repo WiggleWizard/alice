@@ -20,44 +20,45 @@ class PluginManager:
 	def load_plugins(self):
 		for fn in os.listdir(self._plugin_dir):
 			file_path = self._plugin_dir + fn
-			folder_name = os.path.splitext(fn)
 
-			if os.path.isdir(file_path):
-				plugin_path = file_path + '/plugin.py'
+			if os.path.isdir(file_path) and os.path.isfile(file_path + '/plugin.py'):
+					self._setup_plugin(file_path)
 
-				if os.path.isfile(plugin_path):
-					# Load up the module
-					f, filename, desc = imp.find_module("plugin", [file_path])
-					plugin = imp.load_module("plugin", f, filename, desc).Plugin()
+	def _setup_plugin(self, plugin_folder_path):
+		folder_name = os.path.basename(plugin_folder_path)
 
-					# If there is no code_name in the plugin, then we set the
-					# code_name according to the folder name that it's in.
-					if not hasattr(plugin, 'name'):
-						print(
-							'[PluginManager][Warning] "' + folder_name +
-							'" plugin has no "code_name" attribute. '
-							'Using the plugin\'s folder name as the code_name'
-						)
-						plugin.name = folder_name
+		# Load up the module
+		f, filename, desc = imp.find_module("plugin", [plugin_folder_path])
+		plugin = imp.load_module("plugin", f, filename, desc).Plugin()
 
-					# Same thing as above but for the friendly name
-					if not hasattr(plugin, 'display_name'):
-						print(
-							'[PluginManager][Warning] Could not load ' + plugin.name +
-							' because it does not contain the "name" attribute'
-						)
-						plugin.display_name = plugin.name
+		# If there is no code_name in the plugin, then we set the
+		# code_name according to the folder name that it's in.
+		if not hasattr(plugin, 'name'):
+			print(
+				'[PluginManager][Warning] "' + folder_name +
+				'" plugin has no "code_name" attribute. '
+				'Using the plugin\'s folder name as the code_name'
+			)
+			plugin.name = folder_name
 
-					plugin._alice = self._alice
-					
-					# Add the priority of the plugin load order to the plugin
-					try:
-						plugin._priority = self._plugin_priority[plugin.name]
-					except KeyError:
-						pass
+		# Same thing as above but for the friendly name
+		if not hasattr(plugin, 'display_name'):
+			print(
+				'[PluginManager][Warning] Could not load ' + plugin.name +
+				' because it does not contain the "name" attribute'
+			)
+			plugin.display_name = plugin.name
 
-					# Add the plugin object in to the list
-					self._plugins.append(plugin)
+		plugin._alice = self._alice
+		
+		# Add the priority of the plugin load order to the plugin
+		try:
+			plugin._priority = self._plugin_priority[plugin.name]
+		except KeyError:
+			pass
+
+		# Add the plugin object in to the list
+		self._plugins.append(plugin)
 
 	##
 	# Sorts the loaded plugins based on their priority number.
