@@ -3,7 +3,6 @@ import os
 import imp
 
 import globals
-from base_plugin import BasePlugin
 
 class PluginManager:
 	def __init__(self, alice):
@@ -24,6 +23,14 @@ class PluginManager:
 			if os.path.isdir(file_path) and os.path.isfile(file_path + '/plugin.py'):
 					self._setup_plugin(file_path)
 
+	##
+	# Correctly sets up a plugin, adding necessary attributes to the plugin
+	# making it easier to write a plugin without having to write a bunch of
+	# predetermined code.
+	# 
+	# _setup_plugin:
+	# 	@param  plugin_folder_path [str] - Full path to the plugin's containing folder.
+	##
 	def _setup_plugin(self, plugin_folder_path):
 		folder_name = os.path.basename(plugin_folder_path)
 
@@ -35,17 +42,16 @@ class PluginManager:
 		# code_name according to the folder name that it's in.
 		if not hasattr(plugin, 'name'):
 			print(
-				'[PluginManager][Warning] "' + folder_name +
-				'" plugin has no "code_name" attribute. '
-				'Using the plugin\'s folder name as the code_name'
+				'[PluginManager][Warning] Plugin "' + plugin.name +
+				'" has no name, using the plugin\'s folder name'
 			)
 			plugin.name = folder_name
 
 		# Same thing as above but for the friendly name
 		if not hasattr(plugin, 'display_name'):
 			print(
-				'[PluginManager][Warning] Could not load ' + plugin.name +
-				' because it does not contain the "name" attribute'
+				'[PluginManager][Warning] Plugin "' + plugin.name +
+				'" has no display name, using the plugin\'s name'
 			)
 			plugin.display_name = plugin.name
 
@@ -68,6 +74,11 @@ class PluginManager:
 	def prioritize_plugins(self):
 		self._plugins.sort(key=lambda x: x._priority)
 
+	##
+	# Usually called after the plugins are loaded into memory.
+	# 
+	# initialize_plugins:
+	##
 	def initialize_plugins(self):
 		for plugin in self._plugins:
 			if hasattr(plugin, 'version'):
