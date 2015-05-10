@@ -106,12 +106,18 @@ class Alice:
 			slot_id     = event.get_arg(0)
 			player_ip   = event.get_arg(1)
 			player_guid = event.get_arg(2)
-			player_name = event.get_arg(3)
+			player_info = event.get_arg(3).split('\\')
 
-			if self._players[slot_id] == None:
-				self._players[slot_id] = Player(self)
+			# Parse the player's name out
+			player_name = ""
+			for i in range(len(player_info)):
+				if player_info[i] == 'name':
+					player_name = player_info[i + 1]
 
+			self._players[slot_id] = Player(self)
 			self._players[slot_id].init(slot_id, player_ip, player_guid, player_name)
+
+			print(self._players[slot_id])
 
 			plugin_man.propagate_on_player_join(self._players[slot_id])
 		elif event_name == 'JOINREQ':
