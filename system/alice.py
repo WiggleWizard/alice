@@ -1,4 +1,5 @@
 import string
+from ConfigParser import ConfigParser
 
 from system.plugin_manager       import PluginManager
 from system.wonderland_interface import WonderlandInterface
@@ -13,6 +14,11 @@ import globals
 
 class Alice:
 	def __init__(self):
+		self._alice_config  = ConfigParser()
+		self._plugin_config = ConfigParser()
+		self._alice_config.read('config.ini')
+		self._plugin_config.read('plugin_config.ini')
+
 		self._players = []
 		self._server_initialized = False
 		self._max_players = 0
