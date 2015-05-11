@@ -1,11 +1,11 @@
 Alice
 =====
 
-Alice is a powerful CoD4 addon. It is love child of GSC and B3/Manu. Alice can do things like this with just 8 lines of code:
+Alice is a powerful CoD4 addon. It is the love child of GSC and B3/Manu. Alice can do things like this with just 8 lines of code:
 
 ![Chat filtering](http://i.imgur.com/U4IjUAg.gif)
 
-```
+```python
 from system.base_plugin import BasePlugin
 
 import re
@@ -29,11 +29,9 @@ Features
 - Lightning fast.
 - Easy to write plugins for.
 - Open source (all tech involved is open source).
-- Event based.
+- Event based/Asyncronous.
 - Can be configured to run remotely. (TCP or IPC)
-- Modular.
 - No log/file parsing involved.
-- Asyncronous.
 - Utilizes and abuses WonderlandX.
 - Super low overhead.
 
