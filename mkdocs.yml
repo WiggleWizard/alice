@@ -4,9 +4,9 @@ theme: readthedocs
 
 pages:
 - ['index.md', 'Introduction']
-- ['installing.md', 'Installing']
+- ['installing.md', 'Installing Alice']
 
-- ['plugins/index.md', 'Plugins', 'Vanilla Plugins']
+- ['plugins/index.md', 'Plugins', 'Introduction']
 - ['plugins/installing.md', 'Plugins', 'Installing a plugin']
 - ['plugins/priorities.md', 'Plugins', 'Priorities']
 
