@@ -1,3 +1,5 @@
+import ConfigParser
+
 class PluginConfig():
 	def __init__(self, config, plugin):
 		self._config = config
@@ -10,9 +12,12 @@ class PluginConfig():
 	# get:
 	##
 	def get(self, key, default=None):
-		v = self._config.get(self._plugin.name, key, 0)
+		try:
+			v = self._config.get(self._plugin.name, key, 0)
 
-		if v == None:
+			if v == None:
+				return default
+
+			return v
+		except ConfigParser.NoSectionError:
 			return default
-
-		return v
