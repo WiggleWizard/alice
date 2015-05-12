@@ -4,6 +4,9 @@ theme: readthedocs
 
 pages:
 - ['index.md', 'Introduction']
+
 - ['plugins/index.md', 'Plugins', 'Vanilla Plugins']
-- ['plugins-mods/index.md', 'Plugin Guide for Mods', 'Plugins: a moderators guide']
-- ['plugins-devs/index.md', 'Plugin Guide for Developers', 'Plugins: a developers guide']
+- ['plugins/installing.md', 'Plugins', 'Installing a plugin']
+- ['plugins/priorities.md', 'Plugins', 'Priorities']
+
+- ['developing-plugins/index.md', 'Developing Plugins', 'Plugins: a developers guide']
