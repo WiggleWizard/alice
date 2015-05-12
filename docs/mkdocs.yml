@@ -4,6 +4,3 @@ theme: readthedocs
 
 pages:
 - ['index.md', 'Introduction']
-- ['plugins/index.md', 'Plugins', 'Vanilla Plugins']
-- ['plugins-mods/index.md', 'Plugin Guide for Mods', 'Plugins: a developer\'s guide']
-- ['plugins-devs/index.md', 'Plugin Guide for Developers', 'Plugins: a developer\'s guide']
