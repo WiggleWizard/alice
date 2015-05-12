@@ -3,6 +3,7 @@ import os
 import imp
 
 import globals
+from system.plugin_config import PluginConfig
 
 class PluginManager:
 	def __init__(self, alice):

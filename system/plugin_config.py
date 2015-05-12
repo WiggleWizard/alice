@@ -1,4 +1,4 @@
-class PluginConfig(self):
+class PluginConfig():
 	def __init__(self, config, plugin):
 		self._config = config
 		self._plugin = plugin
@@ -10,7 +10,7 @@ class PluginConfig(self):
 	# get:
 	##
 	def get(self, key, default=None):
-		v = self._plugin.get(self._plugin.name, key, 0)
+		v = self._config.get(self._plugin.name, key, 0)
 
 		if v == None:
 			return default

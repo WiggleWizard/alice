@@ -16,14 +16,11 @@ class Plugin(BasePlugin):
 	display_name = 'Advanced Commands'
 	version      = '0.1a'
 
-	def __init__(self):
-		self._director = "!"
+	def on_plugin_init(self):
+		self._director = self.config.get("directive", "!")
 		self._commands_dir = system.globals.PLUGINS_PATH + '/adv_commands_data/'
 
 		self._commands = []
-
-	def on_plugin_init(self):
-		pass
 
 	def register_command(self, function, alias, argc, required_perm=None):
 		self._commands.append({
