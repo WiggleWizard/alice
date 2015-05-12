@@ -2,7 +2,7 @@ Alice
 =====
 
 ![Runs on Python 2.x](https://img.shields.io/badge/Python-2.x-brightgreen.svg)
-![![Doc version](https://readthedocs.org/projects/alice/badge/?version=latest)](http://alice.readthedocs.org/)
+[![Doc version](https://readthedocs.org/projects/alice/badge/?version=latest)](http://alice.readthedocs.org/)
 
 Alice is a powerful CoD4 addon. It is the love child of GSC and B3/Manu. Alice can do things like this with just 8 lines of code:
 
