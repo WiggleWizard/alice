@@ -1,0 +1,6 @@
+site_name: Alice
+repo_url: https://github.com/Zinglish/alice
+theme: readthedocs
+
+pages:
+- ['index.md', 'Introduction']

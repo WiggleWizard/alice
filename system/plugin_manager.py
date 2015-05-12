@@ -56,6 +56,9 @@ class PluginManager:
 			plugin.display_name = plugin.name
 
 		plugin._alice = self._alice
+
+		# Create a new config object for this plugin
+		plugin.config = PluginConfig(self._alice._plugin_config, plugin)
 		
 		# Add the priority of the plugin load order to the plugin
 		try:
