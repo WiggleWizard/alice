@@ -5,12 +5,12 @@ import MySQLdb
 from system.player import Player
 
 class Plugin(BasePlugin):
+	
+	self.name         = "database"
+	self.display_name = "Database Connector"
+	self.version      = "1.0"
+	
 	def __init__(self):
-		super(BasePlugin, self).__init__()
-
-		self.name    = "Database"
-		self.version = "1.0"
-
 		self._db     = None
 		self._cursor = None
 

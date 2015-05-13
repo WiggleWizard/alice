@@ -9,8 +9,9 @@ class PluginManager:
 	def __init__(self, alice):
 		self._plugin_dir = globals.PLUGINS_PATH + "/"
 
-		self._alice = alice
+		self._alice   = alice
 		self._plugins = []
+		self._events  = {}
 
 		# Load the plugin priority
 		json_data = open(globals.BASE_PATH + '/plugin_priority.cfg')
@@ -112,7 +113,17 @@ class PluginManager:
 
 
 	#=======================================================================================#
-	# Plugin Propagation Calls                                                              #
+	# Custom Plugin Propagation Calls                                                              #
+	#=======================================================================================#
+	
+	def propagate_event(self, event, params):
+		for plugin in self._plugins:
+			if hasattr(plugin, event):
+				plugin[event](*params)
+
+
+	#=======================================================================================#
+	# Alice Plugin Propagation Calls                                                              #
 	#=======================================================================================#
 		
 	def propagate_on_server_init(self):
