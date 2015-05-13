@@ -131,8 +131,9 @@ class Alice:
 			plugin_man.propagate_on_join_req(ip, qport)
 		elif event_name == 'DC':
 			slot_id = event.get_arg(0)
+			player  = self._players[slot_id]
 
-			plugin_man.propagate_on_player_dc(slot_id)
+			plugin_man.propagate_on_player_dc(player)
 
 			self._players[slot_id] = None
 
