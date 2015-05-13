@@ -11,7 +11,6 @@ class PluginManager:
 
 		self._alice   = alice
 		self._plugins = []
-		self._events  = {}
 
 		# Load the plugin priority
 		json_data = open(globals.BASE_PATH + '/plugin_priority.cfg')
