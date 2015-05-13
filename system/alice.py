@@ -132,7 +132,7 @@ class Alice:
 		elif event_name == 'DC':
 			slot_id = event.get_arg(0)
 
-			plugin_man.propagate_on_dc(slot_id)
+			plugin_man.propagate_on_player_dc(slot_id)
 
 			self._players[slot_id] = None
 
