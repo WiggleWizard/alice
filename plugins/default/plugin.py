@@ -13,4 +13,6 @@ class Plugin(BasePlugin):
 		self.accept_ip(ip, qport)
 
 	def on_player_chat(self, player, message):
-		self.broadcast_chat(str(player) + ": " + message)
+		message = str(player) + ": " + message;
+		self.broadcast_chat(message)
+		return message

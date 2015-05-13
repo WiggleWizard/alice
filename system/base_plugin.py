@@ -23,3 +23,6 @@ class BasePlugin(object):
 
 	def find_players_by_partial(self, partial_name):
 		return self._alice.find_players_by_partial(partial_name)
+
+	def get_players():
+		return self._alice.players
