@@ -1,3 +1,4 @@
 *.pyc
 *.py~
 *.cfg~
+/plugin_config.ini
