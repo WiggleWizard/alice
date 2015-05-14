@@ -10,12 +10,18 @@ class Plugin(BasePlugin):
 	requires     = ['database']
 
 	def on_plugin_init(self):
+		# Get the table names
+		# TODO: Prepared statements wrap quotes around strings when formatting
+		#       so table names in a prepared statement won't work. For obvious reasons.
+		#self._table_sessions = self.config.get('session_table', 'phpbb_sessions')
+		#self._table_users    = self.config.get('users_table', 'phpbb_users')
+
 		self._extend_player()
 
 		# Get the database plugin instance and ensure that
 		# we can access the DB cursor from this plugin.
 		db_plugin = self.get_plugin("database")
-		self._db_cursor = db_plugin._db_cursor
+		self._db_cursor = db_plugin._cursor
 
 	def _extend_player(self):
 		# Variables
@@ -26,29 +32,22 @@ class Plugin(BasePlugin):
 		Player._phpbb_group_id     = 0
 
 	def on_player_join(self, player):
+		print(player.get_ip())
 		# When a player joins, the plugin will poll the PHPBB
 		# database with the player's IP and gets the player's
 		# PHPBB data.
 		sql = """
 			SELECT
-				last_activity,
-				user_data
+				session_user_id
 			FROM
-				sessions
+				phpbb_sessions
 			WHERE
-				ip_address = %s
-			ORDER BY last_activity DESC
+				session_ip = %s
 		"""
-		self.db_cursor.execute(sql, [self._ip])
-		data = self.db_cursor.fetchone()
+		self._db_cursor.execute(sql, [player.get_ip()])
+		data = self._db_cursor.fetchone()
 
 		# Decode the data that's stored by Sigil in the database
 		if data:
-			user_data  = loads(data[1])
-
-			if "account_id" in user_data:
-				self._sigil_id     = int(user_data['account_id'])
-				self._is_logged_in = True
-				return True
-
-		return False
+			player._phpbb_is_logged_in = True
+			player._phpbb_id = data[0]
