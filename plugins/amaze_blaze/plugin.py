@@ -21,8 +21,6 @@ class Plugin(BasePlugin):
 		player.is_blazing = False
 
 	def command_420(self, executor, args):
-		executor.kick("TEST")
-		
 		# Wants to pass his blaze on to another player
 		if len(args) > 0:
 			if not executor.is_blazing:
