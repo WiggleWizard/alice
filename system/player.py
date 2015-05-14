@@ -1,3 +1,5 @@
+from system.function import Function
+
 import re
 
 class Player:
@@ -18,7 +20,8 @@ class Player:
 		self._name = name
 
 	def tell(self, message):
-		self._alice.tell(self._id, message)
+		void_func = Function('TELL', 0, self._id, message)
+		self._alice._rabbithole.send_void_func(void_func)
 
 	def get_ip(self):
 		return self._ip
@@ -28,3 +31,7 @@ class Player:
 
 	def get_clean_name(self):
 		return re.sub(r"\^\d", "", self._name)
+
+	def kick(self, reason):
+		void_func = Function('KICK', 0, self._id, reason)
+		self._alice._rabbithole.send_void_func(void_func)
