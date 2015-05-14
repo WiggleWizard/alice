@@ -8,6 +8,7 @@ from system.plugin_config import PluginConfig
 class PluginManager:
 	def __init__(self, alice):
 		self._plugin_dir = globals.PLUGINS_PATH + "/"
+		self._plugin_dirs = {'default': 'plugins'}
 
 		self._alice   = alice
 		self._plugins = []
