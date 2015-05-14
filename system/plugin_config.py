@@ -21,3 +21,5 @@ class PluginConfig():
 			return v
 		except ConfigParser.NoSectionError:
 			return default
+		except ConfigParser.NoOptionError:
+			return default
