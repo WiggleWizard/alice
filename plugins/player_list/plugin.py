@@ -4,8 +4,8 @@ from system.player import Player
 
 class Plugin(BasePlugin):
 	
-	name         = 'info'
-	display_name = 'info'
+	name         = 'player_list'
+	display_name = 'Player List'
 	requires     = ['advanced_commands']
 
 	def on_plugin_init(self):
