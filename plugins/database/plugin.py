@@ -5,22 +5,21 @@ import MySQLdb
 from system.player import Player
 
 class Plugin(BasePlugin):
+	
+	name         = "database"
+	display_name = "Database Connector"
+	version      = "1.0"
+	
 	def __init__(self):
-		super(BasePlugin, self).__init__()
-
-		self.name    = "Database"
-		self.version = "1.0"
-
 		self._db     = None
 		self._cursor = None
 
-
 	def on_plugin_init(self):
 		self.log_info("Database connecting")
-		self._db = MySQLdb.connect(host=   "localhost",
-								   user=   "root",
-								   passwd= "terence",
-								   db=     "sigil")
+		self._db = MySQLdb.connect(host=   self.config.get('host', "localhost"),
+								   user=   self.config.get('user', "root"),
+								   passwd= self.config.get('password', ""),
+								   db=     self.config.get('database', ""))
 		self.log_info("Connection successful")
 
 		self._cursor = self._db.cursor()

@@ -14,7 +14,7 @@ class Plugin(BasePlugin):
 
 	name         = 'advanced_commands'
 	display_name = 'Advanced Commands'
-	version      = '0.1a'
+	version      = '1.0'
 
 	def __init__(self):
 		self._commands = []
