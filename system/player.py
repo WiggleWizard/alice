@@ -23,5 +23,8 @@ class Player:
 	def get_ip(self):
 		return self._ip
 
+	def get_id(self):
+		return self._id
+
 	def get_clean_name(self):
 		return re.sub(r"\^\d", "", self._name)

@@ -27,3 +27,6 @@ class BasePlugin(object):
 	def propogate_event(self, event, params):
 		plugin_manager = self._alice.get_plugin_manager()
 		return plugin_manager.propagate_event(event, params)
+
+	def get_players():
+		return self._alice.players
