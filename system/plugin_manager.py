@@ -27,7 +27,7 @@ class PluginManager:
 		rtn['default'] = os.path.abspath("plugins")
 
 		# Loop through all the dirs defined in the config and get all the paths
-		config_items = self._alice._alice_config.items("plugin_directories")
+		config_items = self._alice._alice_config.items("plugin_groups")
 		for key, value in config_items:
 			# We have already provided the plugins directory as default
 			# so we don't need duplicates.
