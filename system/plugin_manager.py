@@ -7,23 +7,55 @@ from system.plugin_config import PluginConfig
 
 class PluginManager:
 	def __init__(self, alice):
-		self._plugin_dir = globals.PLUGINS_PATH + "/"
-		self._plugin_dirs = {'default': 'plugins'}
-
 		self._alice   = alice
 		self._plugins = []
+
+		self._plugin_groups = self._load_plugin_groups()
 
 		# Load the plugin priority
 		json_data = open(globals.BASE_PATH + '/plugin_priority.cfg')
 		self._plugin_priority = json.load(json_data)
 		json_data.close()
 
-	def load_plugins(self):
-		for fn in os.listdir(self._plugin_dir):
-			file_path = self._plugin_dir + fn
+	##
+	# Reads the keys and values from the general config and inserts the keys as
+	# a key in the dictionary and inserts the absolute path of the value of each key
+	# into the value of the dictionary.
+	##
+	def _load_plugin_groups(self):
+		rtn = {}
+		rtn['default'] = os.path.abspath("plugins")
 
-			if os.path.isdir(file_path) and os.path.isfile(file_path + '/plugin.py'):
-					self._setup_plugin(file_path)
+		# Loop through all the dirs defined in the config and get all the paths
+		config_items = self._alice._alice_config.items("plugin_directories")
+		for key, value in config_items:
+			# We have already provided the plugins directory as default
+			# so we don't need duplicates.
+			if value != 'plugins':
+				rtn[key] = os.path.abspath(value)
+
+		return rtn
+
+	def load_plugins(self):
+		plugin_groups = self._plugin_groups.items()
+		for group, group_path in plugin_groups:
+			# Check to see if the pugin group's path exists
+			if os.path.isdir(group_path):
+				self._load_plugin_group(group, group_path)
+			else:
+				print(
+					"[PluginManager][Warning] Failed to load plugin group '" + group +
+					"' because the group's path (" + group_path + 
+					") does not exist"
+				)
+
+	def _load_plugin_group(self, group, group_path):
+		dir_list = os.listdir(group_path)
+		for fd in dir_list:
+			plugin_path = group_path + "/" + fd
+
+			if os.path.isdir(plugin_path) and os.path.isfile(plugin_path + '/plugin.py'):
+				self._setup_plugin(plugin_path)
 
 	##
 	# Correctly sets up a plugin, adding necessary attributes to the plugin
@@ -31,13 +63,13 @@ class PluginManager:
 	# predetermined code.
 	# 
 	# _setup_plugin:
-	# 	@param  plugin_folder_path [str] - Full path to the plugin's containing folder.
+	# 	@param  plugin_path [str] - Full path to the plugin's containing folder.
 	##
-	def _setup_plugin(self, plugin_folder_path):
-		folder_name = os.path.basename(plugin_folder_path)
+	def _setup_plugin(self, plugin_path):
+		folder_name = os.path.basename(plugin_path)
 
 		# Load up the module
-		f, filename, desc = imp.find_module("plugin", [plugin_folder_path])
+		f, filename, desc = imp.find_module("plugin", [plugin_path])
 		plugin = imp.load_module("plugin", f, filename, desc).Plugin()
 
 		# If there is no code_name in the plugin, then we set the
