@@ -10,12 +10,8 @@ class PluginManager:
 		self._alice   = alice
 		self._plugins = []
 
-		self._plugin_groups = self._load_plugin_groups()
-
-		# Load the plugin priority
-		json_data = open(globals.BASE_PATH + '/plugin_priority.cfg')
-		self._plugin_priority = json.load(json_data)
-		json_data.close()
+		self._plugin_groups   = self._load_plugin_groups()
+		self._plugin_priority = self._get_priority_list()
 
 	##
 	# Reads the keys and values from the general config and inserts the keys as
@@ -102,6 +98,11 @@ class PluginManager:
 
 		# Add the plugin object in to the list
 		self._plugins.append(plugin)
+
+	def _get_priority_list(self):
+		config_items = self._alice._alice_config.items("plugin_priority")
+		for key, value in config_items:
+			self._plugin_priority[key] = value
 
 	##
 	# Sorts the loaded plugins based on their priority number.
