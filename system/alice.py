@@ -1,4 +1,5 @@
 import string
+import re
 from ConfigParser import ConfigParser
 
 from system.plugin_manager       import PluginManager
@@ -11,6 +12,7 @@ from system.function import Function
 from system.player import Player
 
 import globals
+
 
 class Alice:
 	def __init__(self):
@@ -276,6 +278,19 @@ class Alice:
 			if player != None:
 				l_player_name = player.get_clean_name().lower()
 				if l_player_name.find(l_partial_name) > -1:
+					rtn.append(player)
+
+		return rtn
+
+	# searching for regex in names
+	def find_player_by_partialEx(self, reg):
+		rtn = []
+		l_reg = reg.lower()
+
+		for player in self._players:
+			if player != None:
+				l_player_name = player.get_clean_name().lower()
+				if re.search(l_reg, l_player_name):
 					rtn.append(player)
 
 		return rtn
