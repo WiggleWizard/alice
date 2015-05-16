@@ -1,6 +1,7 @@
 import json
 import os
 import imp
+import sys
 
 import globals
 from system.plugin_config import PluginConfig
@@ -37,6 +38,9 @@ class PluginManager:
 		return rtn
 
 	def _load_plugin_group(self, group, group_path):
+		# Make it easier to import from plugins
+		sys.path.append(group_path)
+
 		dir_list = os.listdir(group_path)
 		for fd in dir_list:
 			plugin_path = group_path + "/" + fd
@@ -152,7 +156,7 @@ class PluginManager:
 
 
 	#=======================================================================================#
-	# Custom Plugin Propagation Calls                                                              #
+	# Custom Plugin Propagation Calls                                                       #
 	#=======================================================================================#
 	
 	def propagate_event(self, event, params):
@@ -162,7 +166,7 @@ class PluginManager:
 
 
 	#=======================================================================================#
-	# Alice Plugin Propagation Calls                                                              #
+	# Alice Plugin Propagation Calls                                                        #
 	#=======================================================================================#
 		
 	def propagate_on_server_init(self):
