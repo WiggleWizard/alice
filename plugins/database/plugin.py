@@ -22,7 +22,7 @@ class Plugin(BasePlugin):
 								   db=     self.config.get('database', ""))
 		self.log_info("Connection successful")
 
-		self._cursor = self._db.cursor()
+		self._cursor = self._db.cursor(MySQLdb.cursors.DictCursor)
 		
 		# Allow player instances access to the database
 		Player.db_cursor = self._cursor
