@@ -2,8 +2,8 @@ class BasePlugin(object):
 	
 	_priority = 99
 
-	def __init__(self):
-		pass
+	def __str__(self):
+		return self.name
 
 	def log_info(self, message):
 		print("[" + self.name + "][Info] " + message)

@@ -16,8 +16,8 @@ class Alice:
 	def __init__(self):
 		self._alice_config  = ConfigParser()
 		self._plugin_config = ConfigParser()
-		self._alice_config.read('config.ini')
-		self._plugin_config.read('plugin_config.ini')
+		self._alice_config.read('alice.cfg')
+		self._plugin_config.read('plugins.cfg')
 
 		self._players = []
 		self._server_initialized = False

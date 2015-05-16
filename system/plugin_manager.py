@@ -11,7 +11,7 @@ class PluginManager:
 		self._alice   = alice
 		self._plugins = []
 
-		self._plugin_groups   = self._load_plugin_groups()
+		self._plugin_groups   = self._get_plugin_groups()
 		self._plugin_priority = self._get_priority_list()
 
 	##
@@ -19,7 +19,7 @@ class PluginManager:
 	# a key in the dictionary and inserts the absolute path of the value of each key
 	# into the value of the dictionary.
 	##
-	def _load_plugin_groups(self):
+	def _get_plugin_groups(self):
 		rtn = {}
 		rtn['default'] = os.path.abspath("plugins")
 
@@ -35,19 +35,6 @@ class PluginManager:
 			pass
 
 		return rtn
-
-	def load_plugins(self):
-		plugin_groups = self._plugin_groups.items()
-		for group, group_path in plugin_groups:
-			# Check to see if the pugin group's path exists
-			if os.path.isdir(group_path):
-				self._load_plugin_group(group, group_path)
-			else:
-				print(
-					"[PluginManager][Warning] Failed to load plugin group '" + group +
-					"' because the group's path (" + group_path + 
-					") does not exist"
-				)
 
 	def _load_plugin_group(self, group, group_path):
 		dir_list = os.listdir(group_path)
@@ -95,22 +82,11 @@ class PluginManager:
 		plugin.config = PluginConfig(self._alice._plugin_config, plugin)
 		
 		# Add the priority of the plugin load order to the plugin
-		try:
+		if plugin.name in self._plugin_priority:
 			plugin._priority = self._plugin_priority[plugin.name]
-		except KeyError:
-			pass
 
 		# Add the plugin object in to the list
 		self._plugins.append(plugin)
-
-	def _get_priority_list(self):
-		rtn = {}
-
-		config_items = self._alice._alice_config.items("plugin_priority")
-		for key, value in config_items:
-			rtn[key] = value
-
-		return rtn
 
 	##
 	# Sorts the loaded plugins based on their priority number.
@@ -151,6 +127,28 @@ class PluginManager:
 		for plugin in self._plugins:
 			if plugin.name == plugin_name:
 				return plugin
+
+	def _get_priority_list(self):
+		rtn = {}
+
+		config_items = self._alice._alice_config.items("plugin_priority")
+		for key, value in config_items:
+			rtn[key] = int(value)
+
+		return rtn
+
+	def load_plugins(self):
+		plugin_groups = self._plugin_groups.items()
+		for group, group_path in plugin_groups:
+			# Check to see if the pugin group's path exists
+			if os.path.isdir(group_path):
+				self._load_plugin_group(group, group_path)
+			else:
+				print(
+					"[PluginManager][Warning] Failed to load plugin group '" + group +
+					"' because the group's path (" + group_path + 
+					") does not exist"
+				)
 
 
 	#=======================================================================================#
