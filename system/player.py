@@ -13,6 +13,10 @@ class Player:
 	def __str__(self):
 		return "[" + str(self._id) + "] " + self._name
 
+	@classmethod
+	def extend(self, func):
+		setattr(self, func.__name__, func)
+
 	def init(self, id, ip, guid, name):
 		self._id   = id
 		self._ip   = ip
