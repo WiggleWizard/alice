@@ -13,6 +13,11 @@ class Plugin(BasePlugin):
 	def on_player_dc(self, player):
 		player._permissions = []
 
+
+#=======================================================================================#
+# Player Extension Functions                                                            #
+#=======================================================================================#
+
 	def _extend_player(self):
 		Player._permissions = []
 
