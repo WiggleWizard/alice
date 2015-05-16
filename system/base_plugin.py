@@ -1,9 +1,15 @@
+from system.player import Player
+
 class BasePlugin(object):
 	
 	_priority = 99
 
 	def __str__(self):
 		return self.name
+
+	@classmethod
+	def extend(self, obj):
+		setattr(obj, func.__name__, func)
 
 	def log_info(self, message):
 		print("[" + self.name + "][Info] " + message)
@@ -28,5 +34,5 @@ class BasePlugin(object):
 		plugin_manager = self._alice.get_plugin_manager()
 		return plugin_manager.propagate_event(event, params)
 
-	def get_players():
+	def get_players(self):
 		return self._alice.players
