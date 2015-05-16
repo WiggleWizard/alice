@@ -106,7 +106,7 @@ class PluginManager:
 			if hasattr(plugin, 'version'):
 				print('[PluginManager] Initializing plugin ' + plugin.display_name + ' v' + plugin.version)
 			else:
-				print('[PluginManager] Initializing ' + plugin.display_name)
+				print('[PluginManager] Initializing plugin ' + plugin.display_name)
 
 			if hasattr(plugin, 'on_plugin_init'):
 				plugin.on_plugin_init()
