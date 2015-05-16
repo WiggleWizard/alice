@@ -4,6 +4,7 @@ import imp
 
 import globals
 from system.plugin_config import PluginConfig
+import ConfigParser
 
 class PluginManager:
 	def __init__(self, alice):
@@ -22,13 +23,16 @@ class PluginManager:
 		rtn = {}
 		rtn['default'] = os.path.abspath("plugins")
 
-		# Loop through all the dirs defined in the config and get all the paths
-		config_items = self._alice._alice_config.items("plugin_groups")
-		for key, value in config_items:
-			# We have already provided the plugins directory as default
-			# so we don't need duplicates.
-			if value != 'plugins':
-				rtn[key] = os.path.abspath(value)
+		try:
+			# Loop through all the dirs defined in the config and get all the paths
+			config_items = self._alice._alice_config.items("plugin_groups")
+			for key, value in config_items:
+				# We have already provided the plugins directory as default
+				# so we don't need duplicates.
+				if value != 'plugins':
+					rtn[key] = os.path.abspath(value)
+		except ConfigParser.NoSectionError:
+			pass
 
 		return rtn
 
@@ -100,9 +104,13 @@ class PluginManager:
 		self._plugins.append(plugin)
 
 	def _get_priority_list(self):
+		rtn = {}
+
 		config_items = self._alice._alice_config.items("plugin_priority")
 		for key, value in config_items:
-			self._plugin_priority[key] = value
+			rtn[key] = value
+
+		return rtn
 
 	##
 	# Sorts the loaded plugins based on their priority number.
