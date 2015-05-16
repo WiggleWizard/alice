@@ -8,6 +8,12 @@ class Plugin(BasePlugin):
 	display_name = "Permissions"
 
 	def on_plugin_init(self):
+		self._extend_player()
+
+	def on_player_dc(self, player):
+		player._permissions = []
+
+	def _extend_player(self):
 		Player._permissions = []
 
 	@Player.extend
