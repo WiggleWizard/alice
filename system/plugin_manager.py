@@ -84,9 +84,9 @@ class PluginManager:
 		# Add the priority of the plugin load order to the plugin
 		if plugin.name in self._plugin_priority:
 			plugin._priority = self._plugin_priority[plugin.name]
-
-		# Add the plugin object in to the list
-		self._plugins.append(plugin)
+			self._plugins.append(plugin)
+		else:
+			print "Plugin " + plugin.name + " is disabled, add priority to enable it"
 
 	##
 	# Sorts the loaded plugins based on their priority number.
