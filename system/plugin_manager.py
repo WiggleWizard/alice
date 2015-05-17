@@ -100,6 +100,30 @@ class PluginManager:
 	def prioritize_plugins(self):
 		self._plugins.sort(key=lambda x: x._priority)
 
+
+	def initalize_plugin(self, plugin):
+		if hasattr(plugin, 'version'):
+			print('[PluginManager] Initializing plugin ' + plugin.display_name + ' v' + plugin.version)
+		else:
+			print('[PluginManager] Initializing plugin ' + plugin.display_name)
+
+		if hasattr(plugin, 'on_plugin_init'):
+			plugin.on_plugin_init()
+
+		if hasattr(plugin, 'requires'):
+			for req_plugin in plugin.requires:
+				req = self.get_plugin_instance(req_plugin)
+
+				if req != None and req.isInitialized == False:
+					initalize_plugin(req)
+
+				if req == None:
+					print "[ERROR] Required plugin " + req_plugin + " for plugin " + plugin.display_name + " was not found"
+
+			#print "requirements for " + plugin.display_name + "are " + str()
+
+		plugin.isInitialized = True
+
 	##
 	# Usually called after the plugins are loaded into memory.
 	# 
@@ -107,13 +131,7 @@ class PluginManager:
 	##
 	def initialize_plugins(self):
 		for plugin in self._plugins:
-			if hasattr(plugin, 'version'):
-				print('[PluginManager] Initializing plugin ' + plugin.display_name + ' v' + plugin.version)
-			else:
-				print('[PluginManager] Initializing plugin ' + plugin.display_name)
-
-			if hasattr(plugin, 'on_plugin_init'):
-				plugin.on_plugin_init()
+			self.initalize_plugin(plugin)
 
 
 	#=======================================================================================#
@@ -131,6 +149,9 @@ class PluginManager:
 		for plugin in self._plugins:
 			if plugin.name == plugin_name:
 				return plugin
+		#print "plugin: " + plugin_name + " not found"
+		return None
+
 
 	def _get_priority_list(self):
 		rtn = {}

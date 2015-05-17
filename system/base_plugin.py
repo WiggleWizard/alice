@@ -3,6 +3,7 @@ from system.player import Player
 class BasePlugin(object):
 	
 	_priority = 99
+	_isInitialized = False
 
 	def __str__(self):
 		return self.name
