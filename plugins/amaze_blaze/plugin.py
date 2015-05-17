@@ -15,7 +15,9 @@ class Plugin(BasePlugin):
 
 		# Register command
 		command_plugin = self.get_plugin("advanced_commands")
-		command_plugin.register_command(self.command_420, "420", 0)
+
+		self._cmd = Command("420", self.command_420, None, "!420");
+		command_plugin.register_command(self._cmd)
 
 	def on_player_dc(self, player):
 		player.is_blazing = False

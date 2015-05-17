@@ -14,11 +14,13 @@ class Plugin(BasePlugin):
 		#self._fmt_entry = self.config.get('entry_format', "[${id}] ${clean_name}^7")
 		
 		# Register command
+		self._cmd = Command("shout", self.command_shout, None, "!shout <message>");
+		self._cmd.add_argument("text", str, "shouting text", "+");
 		command_plugin = self.get_plugin("advanced_commands")
-		command_plugin.register_command(self.command_shout, 'shout', 0);
+		command_plugin.register_command(self._cmd);
 
 	# list all players
 	def command_shout(self, executor, args): 
-		if(len(args)>0):
-			for col in range(0, 5):
-				self.broadcast_chat('^'+str(col) + ' '.join(str(x) for x in args))
+		msg = ' '.join(str(x) for x in args.text)
+		for col in range(0, 5):
+			self.broadcast_chat('^'+str(col) + msg)

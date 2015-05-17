@@ -1,5 +1,6 @@
 import os
 import imp
+import argparse
 import system.globals
 
 from system.base_plugin import BasePlugin
@@ -9,6 +10,39 @@ CMD_STATUS_NO_CMD      = 0
 CMD_STATUS_SUCCESS     = 1
 CMD_STATUS_MISSING_ARG = 2
 CMD_STATUS_NO_PERMS    = 3
+CMD_STATUS_ARGS_TOO_LONG=4
+
+class ArgumentParserError(Exception): pass
+
+class ThrowingArgumentParser(argparse.ArgumentParser):
+    def error(self, message):
+        raise ArgumentParserError(message)
+
+class Command:
+	def __init__(self, name, command_method, perm, hint):
+		self._alias = name
+		self._parser = ThrowingArgumentParser(add_help=False)
+		self._command = command_method
+		self._perm = perm
+		self._hint = hint
+
+	def add_argument(self, arg_name, arg_type, hint, rep=1):
+		self._parser.add_argument(arg_name, type=arg_type, help=hint, nargs=rep)
+
+	def execute(self, executor, args):
+		#try:
+			pargs = self._parser.parse_args(args)
+			print args
+
+			self._command(executor, pargs);
+		#except ArgumentParserError as ape:
+		#	executor.tell("^1Invalid command semantics: " + str(ape))
+
+	def get_plugin(self, plugin_name):
+		plugin_manager = self._alice.get_plugin_manager()
+		return plugin_manager.get_plugin_instance(plugin_name)
+		
+
 
 class Plugin(BasePlugin):
 
@@ -21,15 +55,11 @@ class Plugin(BasePlugin):
 
 	def on_plugin_init(self):
 		self._director = self.config.get("directive", "!")
-		self._commands_dir = system.globals.PLUGINS_PATH + '/adv_commands_data/'
+#		self._commands_dir = system.globals.PLUGINS_PATH + '/adv_commands_data/'
 
-	def register_command(self, function, alias, argc, required_perm=None):
-		self._commands.append({
-			'function':      function,
-			'alias':         alias,
-			'argc':          argc,
-			'required_perm': required_perm
-		})
+	def register_command(self, cmd):
+		self._commands.append(cmd)
+
 
 	##
 	# Triggered when a player chats.
@@ -50,6 +80,8 @@ class Plugin(BasePlugin):
 					player.tell("^1No such command")
 				elif cmd_result == CMD_STATUS_NO_PERMS:
 					player.tell("^1You do not have permission to execute this command")
+				elif cmd_result == CMD_STATUS_ARGS_TOO_LONG:
+					player.tell("^1Argument string too long")
 			else:
 				player.tell("^1Invalid command semantics")
 		else:
@@ -91,37 +123,40 @@ class Plugin(BasePlugin):
 	# 	$return            [int]    - See CMD_STATUS_... for returns
 	##
 	def _attempt_exec(self, player, cmd_issued, arg_string):
+
+		cmd_candidate = [];
 		for command in self._commands:
-			if command['alias'] == cmd_issued:
-				if command['required_perm'] != None:
-					if not player.has_perm(command['required_perm']):
+			if command._alias == cmd_issued:
+				if command._perm != None:
+					if not player.has_perm(command._perm):
 						return CMD_STATUS_NO_PERMS
 
 				# Attempt to split the args according to how the command
 				# specified.
-				split_max = command['argc']
+				#split_max = command['argc']
 
-				args = arg_string.split(" ", split_max)
+				if(len(arg_string) > 100):
+					return CMD_STATUS_ARGS_TOO_LONG
+
+				args = arg_string.split(" ")
 
 				if args[0] == "":
 					args = []
 
-				# If the amount of args that came from the arg splitting
-				# code doesn't match the number of expected args from
-				# the command then just return a status.
-				if command['argc'] != 0 and len(args) != command['argc']:
-					return CMD_STATUS_MISSING_ARG
-
-				# When executing the function attached to the command, we
-				# give the function chance to return a status that will
-				# then result in a generic response from this plugin.
-				cmd_result = command['function'](player, args)
-
+				try:
+					command.execute(player, args);
+				except ArgumentParserError as ape:
+					cmd_candidate.append(command._hint+": " + str(ape))
+					continue
+					#executor.tell("^1Invalid command semantics: " + str(ape))
+				
 				# If the command returns no status then we automatically
 				# assume it handled its own output.
+				cmd_result = None
 				if cmd_result == None:
 					cmd_result = CMD_STATUS_SUCCESS
 
 				return cmd_result
 
+		player.tell("^1Invalid command semantics, candidates are: " + " ".join(cmd_candidate))
 		return CMD_STATUS_NO_CMD
