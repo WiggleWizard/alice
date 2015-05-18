@@ -174,10 +174,10 @@ class PluginManager:
 			if hasattr(plugin, "on_server_init"):
 				plugin.on_server_init()
 
-	def propagate_on_join_req(self, ip, qport):
+	def propagate_on_join_req(self, slot_id, player_ip, player_guid, player_name):
 		for plugin in self._plugins:
 			if hasattr(plugin, "on_join_req"):
-				plugin.on_join_req(ip, qport)
+				plugin.on_join_req(slot_id, player_ip, player_guid, player_name)
 
 	def propagate_on_player_chat(self, player, message):
 		# Filter the stupid NAK character
@@ -200,3 +200,8 @@ class PluginManager:
 		for plugin in self._plugins:
 			if hasattr(plugin, "on_player_dc"):
 				plugin.on_player_dc(player)
+
+	def propagate_on_player_joined(self, player):
+		for plugin in self._plugins:
+			if hasattr(plugin, "on_player_joined"):
+				plugin.on_player_joined(player)

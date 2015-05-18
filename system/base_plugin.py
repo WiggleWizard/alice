@@ -14,11 +14,11 @@ class BasePlugin(object):
 	def log_info(self, message):
 		print("[" + self.name + "][Info] " + message)
 
-	def accept_ip(self, ip, qport):
-		self._alice.accept_ip(ip, qport)
+	def limbo_accept(self, slot_id):
+		self._alice.limbo_accept(slot_id)
 
-	def deny_ip(self, ip, qport, message):
-		self._alice.deny_ip(ip, qport, message)
+	def limbo_deny(self, slot_id, reason):
+		self._alice.limbo_deny(slot_id, reason)
 
 	def broadcast_chat(self, message):
 		self._alice.broadcast_chat(message)

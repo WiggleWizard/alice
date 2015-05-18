@@ -127,15 +127,30 @@ class Alice:
 
 			plugin_man.propagate_on_player_join(self._players[slot_id])
 		elif event_name == 'JOINREQ':
-			ip    = event.get_arg(0)
-			qport = event.get_arg(1)
+			slot_id     = event.get_arg(0)
+			player_ip   = event.get_arg(1)
+			player_guid = event.get_arg(2)
+			player_info = event.get_arg(3).split('\\')
 
-			plugin_man.propagate_on_join_req(ip, qport)
+			# Parse the player's name out
+			player_name = ""
+			for i in range(len(player_info)):
+				if player_info[i] == 'name':
+					player_name = player_info[i + 1]
+
+			plugin_man.propagate_on_join_req(slot_id, player_ip, player_guid, player_name)
 		elif event_name == 'DC':
 			slot_id = event.get_arg(0)
 			player  = self._players[slot_id]
 
 			plugin_man.propagate_on_player_dc(player)
+
+			self._players[slot_id] = None
+		elif event_name == 'JOINED':
+			slot_id = event.get_arg(0)
+			player  = self._players[slot_id]
+
+			plugin_man.propagate_on_player_joined(player)
 
 			self._players[slot_id] = None
 
@@ -184,24 +199,22 @@ class Alice:
 	# Accepts a Limbo'd IP address.
 	#
 	# accept_ip:
-	# 	@param ip    [str] - IP of the address that's in Limbo
-	# 	@param qport [int] - Quake port
+	# 	@param slot_id [int] - Slot to deny the limbo on
 	##
-	def accept_ip(self, ip, qport):
-		void_func = Function('LIMBOACCEPT', ip, qport)
+	def limbo_accept(self, slot_id):
+		void_func = Function('LIMBOACCEPT', 0, slot_id)
 		self._rabbithole.send_void_func(void_func)
 
 	##
 	# Denies an IP in Limbo. Shows a reason why the IP was denied to the user.
 	# 
-	# deny_ip:
-	# 	@param ip      [str] - IP of the address that's in Limbo
-	# 	@param qport   [int] - Quake port
+	# limbo_deny:
+	# 	@param slot_id [int] - Slot to deny the limbo on
 	# 	@param message [str] - Reason why the IP was denied, this is shown to the
-	# 						   user.
+	# 						   player who was denied.
 	##
-	def deny_ip(self, ip, qport, message):
-		void_func = Function('LIMBODENY', ip, qport, message)
+	def limbo_deny(self, slot_id, reason):
+		void_func = Function('LIMBODENY', 0, slot_id, reason)
 		self._rabbithole.send_void_func(void_func)
 
 	##
