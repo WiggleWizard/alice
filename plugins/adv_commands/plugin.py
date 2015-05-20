@@ -1,56 +1,16 @@
 from system.base_plugin import BasePlugin
 
-class Command(object):
-
-	CMD_STATUS_NO_CMD         = 0
-	CMD_STATUS_SUCCESS        = 1
-	CMD_STATUS_MISSING_ARG    = 2
-	CMD_STATUS_NO_PERMS       = 3
-	CMD_STATUS_ARGS_TOO_LONG  = 4
-	CMD_STATUS_ARGS_TOO_SHORT = 5
-	CMD_STATUS_ARG_PARSE_ERROR = 6
-
-	def __init__(self, aliases, func, perm):
-		self._aliases = aliases
-		self._func    = func
-		self._perm    = perm
-
-		self._parameters       = []
-		self._mandatory_params = 0
-		self._optional_params  = 0
-		self._has_free_text        = False
-		
-	def add_param(self, name, parse_method, hint, description, optional=False):
-		self._parameters.append({
-			'name': name,
-			'parse_method': parse_method,
-			'hint': hint,
-			'description': description
-		})
-
-		if optional:
-			self._optional_params++
-		else
-			self._mandatory_params++
-
-	def has_free_text(self, b=True):
-		self._has_free_text = b
-
-	def param_count(self):
-		return len(self._parameters)
-
-	def mandatory_param_count(self):
-		return self._mandatory_params
-
-	def optional_param_count(self):
-		return self._optional_params
-
-
 class Plugin(BasePlugin):
 
 	name         = 'advanced_commands'
 	display_name = 'Advanced Commands'
 	version      = '2.0a'
+
+	CMD_STATUS_NO_CMD          = 0
+	CMD_STATUS_SUCCESS         = 1
+	CMD_STATUS_NO_PERMS        = 3
+	CMD_STATUS_INVALID_USE     = 5
+	CMD_STATUS_ARG_PARSE_ERROR = 6
 
 	def on_plugin_init(self):
 		self._commands = []
@@ -77,12 +37,12 @@ class Plugin(BasePlugin):
 			if cmd_issued:
 				cmd_result = self._attempt_exec(player, cmd_issued, arg_string)
 
-				if cmd_result == CMD_STATUS_NO_CMD:
+				if cmd_result == self.CMD_STATUS_NO_CMD:
 					player.tell("^1No such command")
-				elif cmd_result == CMD_STATUS_NO_PERMS:
+				elif cmd_result == self.CMD_STATUS_NO_PERMS:
 					player.tell("^1You do not have permission to execute this command")
-				elif cmd_result == CMD_STATUS_ARGS_TOO_LONG:
-					player.tell("^1Argument string too long")
+				elif cmd_result == self.CMD_STATUS_INVALID_USE:
+					player.tell("^1Invalid use")
 			else:
 				player.tell("^1Invalid command semantics")
 		else:
@@ -128,8 +88,8 @@ class Plugin(BasePlugin):
 			# Commands can have multiple aliases, so we check for them here
 			if cmd_issued in command._aliases:
 				# If the player doesn't have the perms then move on
-				if command._perm != None and not player.has_perm(command._perm):
-					return CMD_STATUS_NO_PERMS
+				if command._perm != None and not player.has_permission(command._perm):
+					return self.CMD_STATUS_NO_PERMS
 
 				args_list = []
 				free_text = None
@@ -139,16 +99,16 @@ class Plugin(BasePlugin):
 				s = len(arg_str_split)
 
 				if s > 0:
-					args_list = arg_str_split[0].trim().split(" ")
-				if s = 2:
-					free_text = arg_str_split[1].trim()
+					args_list = arg_str_split[0].strip().split(" ")
+				if s == 2:
+					free_text = arg_str_split[1].strip()
 
 				# If the amount of arguments parsed does not match the required
 				# amount of args the command requires then send an error.
 				if len(args_list) < command.mandatory_param_count():
-					return Command.CMD_STATUS_ARGS_TOO_SHORT
+					return self.CMD_STATUS_INVALID_USE
 				if len(args_list) > command.param_count():
-					return Command.CMD_STATUS_ARGS_TOO_LONG
+					return self.CMD_STATUS_INVALID_USE
 
 				# Loop through the parameters of the command and add each
 				# one to the dictionary and call the parsing function
@@ -156,26 +116,63 @@ class Plugin(BasePlugin):
 				args = {}
 				i = 0
 				for arg in args_list:
-					r = command._parameters[i].parse_method(arg)
+					r = command._parameters[i]['parse_method'](arg)
 
-					if not r:
-						return Command.CMD_STATUS_ARG_PARSE_ERROR
+					if r == None:
+						return self.CMD_STATUS_ARG_PARSE_ERROR
 
-					args[command._parameters[i].name] = r
+					args[command._parameters[i]['name']] = r
 					
-					i++
+					i += 1
 
-				try:
-					command.execute(player, args);
+				command._func(player, args, free_text)
 				
 				# If the command returns no status then we automatically
 				# assume it handled its own output.
 				cmd_result = None
 				if cmd_result == None:
-					cmd_result = CMD_STATUS_SUCCESS
+					cmd_result = self.CMD_STATUS_SUCCESS
 
 				return cmd_result
-		return CMD_STATUS_NO_CMD
+		return self.CMD_STATUS_NO_CMD
 
 	def param_parse_player_search(self, search):
 		return []
+
+
+class Command(object):
+
+	def __init__(self, aliases, func, perm):
+		self._aliases = aliases
+		self._func    = func
+		self._perm    = perm
+
+		self._parameters       = []
+		self._mandatory_params = 0
+		self._optional_params  = 0
+		self._has_free_text        = False
+		
+	def add_param(self, name, parse_method, hint, description, optional=False):
+		self._parameters.append({
+			'name': name,
+			'parse_method': parse_method,
+			'hint': hint,
+			'description': description
+		})
+
+		if optional:
+			self._optional_params += 1
+		else:
+			self._mandatory_params += 1
+
+	def has_free_text(self, b=True):
+		self._has_free_text = b
+
+	def param_count(self):
+		return len(self._parameters)
+
+	def mandatory_param_count(self):
+		return self._mandatory_params
+
+	def optional_param_count(self):
+		return self._optional_params

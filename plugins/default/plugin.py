@@ -9,8 +9,8 @@ class Plugin(BasePlugin):
 	def on_plugin_init(self):
 		pass
 
-	def on_join_req(self, ip, qport):
-		self.accept_ip(ip, qport)
+	def on_join_req(self, slot_id, player_ip, player_guid, player_name):
+		self.limbo_deny(slot_id, "TEST")
 
 	def on_player_chat(self, player, message):
 		message = str(player) + ": " + message;

@@ -32,7 +32,6 @@ class Plugin(BasePlugin):
 		Player._phpbb_group_id     = 0
 
 	def on_player_join(self, player):
-		print(player.get_ip())
 		# When a player joins, the plugin will poll the PHPBB
 		# database with the player's IP and gets the player's
 		# PHPBB data.
@@ -47,7 +46,7 @@ class Plugin(BasePlugin):
 		self._db_cursor.execute(sql, [player.get_ip()])
 		data = self._db_cursor.fetchone()
 
-		# Decode the data that's stored by Sigil in the database
+		# Decode the data that's stored by PHPBB in the database
 		if data:
 			player._phpbb_is_logged_in = True
-			player._phpbb_id = data[0]
+			player._phpbb_id = data['session_user_id']
