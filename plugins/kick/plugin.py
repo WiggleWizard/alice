@@ -15,7 +15,7 @@ class Plugin(BasePlugin):
 		cmd = command_plugin.register_command(["k", "kick"], self.command_kick, None)
 		cmd.add_param(
 			"players",
-			command_plugin.param_parse_player_search,
+			command_plugin.filter_player_search,
 			"id/player name",
 			"Slot ID or a partial name"
 		)
