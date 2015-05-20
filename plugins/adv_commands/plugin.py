@@ -8,19 +8,29 @@ class Plugin(BasePlugin):
 
 	CMD_STATUS_NO_CMD          = 0
 	CMD_STATUS_SUCCESS         = 1
-	CMD_STATUS_NO_PERMS        = 3
-	CMD_STATUS_INVALID_USE     = 5
-	CMD_STATUS_ARG_PARSE_ERROR = 6
+	CMD_STATUS_NO_PERMS        = 2
+	CMD_STATUS_INVALID_USE     = 3
+	CMD_STATUS_ARG_PARSE_ERROR = 4
 
-	def on_plugin_init(self):
-		self._commands = []
-		self._director = self.config.get("directive", "!")
+
+	#=======================================================================================#
+	# External                                                                              #
+	#=======================================================================================#
 
 	def register_command(self, aliases, func, perm):
 		cmd = Command(aliases, func, perm)
 		self._commands.append(cmd)
 
 		return cmd
+
+
+	#=======================================================================================#
+	# Triggers                                                                              #
+	#=======================================================================================#
+	
+	def on_plugin_init(self):
+		self._commands = []
+		self._director = self.config.get("directive", "!")
 
 	##
 	# Triggered when a player chats.
@@ -47,6 +57,33 @@ class Plugin(BasePlugin):
 				player.tell("^1Invalid command semantics")
 		else:
 			return message
+
+
+	#=======================================================================================#
+	# Filters                                                                               #
+	#=======================================================================================#
+
+	def filter_player_search(self, search):
+		# ID is a priority here, so we attempt to parse
+		# to int first.
+		try:
+			player_id = int(search)
+
+			if player_id > self.max_slots():
+				raise ValueError
+
+			return [self.get_player(player_id)]
+
+		# Now we search by partial name
+		except ValueError:
+			player_search = self.find_players_by_partial(search)
+
+			return player_search
+
+
+	#=======================================================================================#
+	# Internal                                                                              #
+	#=======================================================================================#
 
 	##
 	# Parses the message into command and arg string.
@@ -100,14 +137,20 @@ class Plugin(BasePlugin):
 
 				if s > 0:
 					args_list = arg_str_split[0].strip().split(" ")
+					args_list = filter(None, args_list)
 				if s == 2:
 					free_text = arg_str_split[1].strip()
+					if free_text == "":
+						free_text = None
 
-				# If the amount of arguments parsed does not match the required
-				# amount of args the command requires then send an error.
-				if len(args_list) < command.mandatory_param_count():
-					return self.CMD_STATUS_INVALID_USE
-				if len(args_list) > command.param_count():
+				# Do some checking here on what arguments were recieved and to
+				# make sure we report that we got the right arguments.
+				if(
+					len(args_list) < command.mandatory_param_count() or
+					len(args_list) > command.param_count() or
+					(free_text == None and command._requires_free_text == True) or
+					(free_text != None and command._requires_free_text == False)
+				):
 					return self.CMD_STATUS_INVALID_USE
 
 				# Loop through the parameters of the command and add each
@@ -136,8 +179,6 @@ class Plugin(BasePlugin):
 				return cmd_result
 		return self.CMD_STATUS_NO_CMD
 
-	def param_parse_player_search(self, search):
-		return []
 
 
 class Command(object):
@@ -147,10 +188,14 @@ class Command(object):
 		self._func    = func
 		self._perm    = perm
 
-		self._parameters       = []
-		self._mandatory_params = 0
-		self._optional_params  = 0
-		self._has_free_text        = False
+		self._parameters         = []
+		self._mandatory_params   = 0
+		self._optional_params    = 0
+		
+		self._requires_free_text    = False
+		self._free_text_name        = ""
+		self._free_text_hint        = ""
+		self._free_text_description = ""
 		
 	def add_param(self, name, parse_method, hint, description, optional=False):
 		self._parameters.append({
@@ -165,8 +210,11 @@ class Command(object):
 		else:
 			self._mandatory_params += 1
 
-	def has_free_text(self, b=True):
-		self._has_free_text = b
+	def set_free_text(self, name, hint, description):
+		self._requires_free_text    = True
+		self._free_text_name        = name
+		self._free_text_hint        = hint
+		self._free_text_description = description
 
 	def param_count(self):
 		return len(self._parameters)

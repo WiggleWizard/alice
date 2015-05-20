@@ -35,5 +35,11 @@ class BasePlugin(object):
 		plugin_manager = self._alice.get_plugin_manager()
 		return plugin_manager.propagate_event(event, params)
 
-	def get_players(self):
+	def get_all_players(self):
 		return self._alice.players
+
+	def max_slots(self):
+		return self._alice.get_max_players()
+
+	def get_player(self, slot_id):
+		return self._alice._players[slot_id]
